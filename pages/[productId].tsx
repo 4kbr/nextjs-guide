@@ -18,11 +18,7 @@ export default function ProductDetail({ product }: any) {
   );
 }
 
-export const getStaticProps: GetStaticProps = async (context) => {
-  const params = context.params;
-  const productId = params?.productId;
-  console.log({ productId });
-
+const getData = async () => {
   const filePath: string = path.join(
     process.cwd(),
     "data",
@@ -32,11 +28,23 @@ export const getStaticProps: GetStaticProps = async (context) => {
   const { products }: { products: Array<any> } = JSON.parse(
     jsonData.toString()
   );
+  return products;
+};
+
+export const getStaticProps: GetStaticProps = async (context) => {
+  const params = context.params;
+  const productId = params?.productId;
+  console.log({ productId });
+
   console.log("products ini");
   // console.log({ products });
 
+  const products = await getData();
+
   const product = products.find((value) => value.id === productId);
   console.log({ product });
+
+  if (!product) return { notFound: true };
 
   return {
     props: {
@@ -46,8 +54,13 @@ export const getStaticProps: GetStaticProps = async (context) => {
 };
 
 export const getStaticPaths: GetStaticPaths = async (context) => {
+  const products = await getData();
+  const ids = products.map((product) => product.id);
+
+  const params = ids.map((id) => ({ params: { productId: id } }));
+
   return {
-    paths: [{ params: { productId: "p1" } }],
+    paths: params,
     fallback: true,
   };
 };
