@@ -16,6 +16,7 @@ export default function Home({ products }: { products: Array<any> }) {
   );
 }
 
+/**get static saat build time */
 export const getStaticProps: GetStaticProps = async (context) => {
   const filePath: string = path.join(
     process.cwd(),
@@ -28,5 +29,6 @@ export const getStaticProps: GetStaticProps = async (context) => {
     props: {
       products,
     },
+    revalidate: 10,
   };
 };
