@@ -1,54 +1,32 @@
+import { GetStaticProps } from "next";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 
-export default function LastSalePage() {
-  const [sales, setSales] = useState([]);
+export default function LastSalePage(props: any) {
+  console.log({ props });
+
+  const [sales, setSales] = useState(props.sales);
   // const [isLoading, setIsLoading] = useState(false);
 
-  const { data, error } = useSWR(process.env.NEXT_URL);
-
-  useEffect(() => {
-    if (data) {
-      const transformSales = [];
-
-      for (const key in data) {
-        transformSales.push({
-          id: key,
-          username: data[key].username,
-          favorit: data[key].favorit,
-        });
-      }
-      setSales(transformSales);
-    }
-  }, [data]);
+  const { data, error, ...res } = useSWR(process.env.NEXT_URL);
 
   // useEffect(() => {
-  //   setIsLoading(true);
-  //   console.log("test ini");
-  //   fetch(`{process.env.NEXT_URL}`)
-  //     .then((response) => response.json())
-  //     .then((data) => {
-  //       console.log({ data });
-  //       const transformSales = [];
-  //       for (const key in data) {
-  //         transformSales.push({
-  //           id: key,
-  //           username: data[key].username,
-  //           favorit: data[key].favorit,
-  //         });
-  //         // setSales((prev) => [
-  //         //   ...prev,
-  //         //   {
-  //         //     id: key,
-  //         //     username: data[key].username,
-  //         //     favorit: data[key].favorit,
-  //         //   },
-  //         // ]);
-  //       }
-  //       setSales(transformSales);
-  //       setIsLoading(false);
-  //     });
-  // }, []);
+  //   console.log({ res });
+  //   console.log({ data });
+
+  //   if (data) {
+  //     const transformSales = [];
+
+  //     for (const key in data) {
+  //       transformSales.push({
+  //         id: key,
+  //         username: data[key].username,
+  //         favorit: data[key].favorit,
+  //       });
+  //     }
+  //     setSales(transformSales);
+  //   }
+  // }, [data]);
 
   console.log("ini last sales");
 
@@ -58,7 +36,7 @@ export default function LastSalePage() {
     return <p>Failed to load.</p>;
   }
 
-  if (!data) return <p>No data here</p>;
+  if (!data && !sales) return <p>No data here</p>;
 
   return (
     <ul>
@@ -71,4 +49,21 @@ export default function LastSalePage() {
   );
 }
 
-// export const
+export const getStaticProps: GetStaticProps = async (context) => {
+  return fetch(process.env.NEXT_URL!)
+    .then((response) => response.json())
+    .then((data) => {
+      console.log({ data });
+      const transformSales = [];
+
+      for (const key in data) {
+        transformSales.push({
+          id: key,
+          username: data[key].username,
+          favorit: data[key].favorit,
+        });
+      }
+
+      return { props: { sales: transformSales }, revalidate: 10 };
+    });
+};
