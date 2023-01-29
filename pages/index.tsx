@@ -1,6 +1,7 @@
 import { GetStaticProps } from "next";
 import fs from "fs/promises";
 import path from "path";
+import Link from "next/link";
 
 export default function Home({ products }: { products: Array<any> }) {
   console.log({ products });
@@ -9,7 +10,9 @@ export default function Home({ products }: { products: Array<any> }) {
     <div>
       <ul>
         {products.map((v, i) => (
-          <li key={i}>{v.title}</li>
+          <li key={i}>
+            <Link href={`/${v.id}`}>{v.title}</Link>
+          </li>
         ))}
       </ul>
     </div>
@@ -25,6 +28,18 @@ export const getStaticProps: GetStaticProps = async (context) => {
   );
   const jsonData = await fs.readFile(filePath);
   const { products } = JSON.parse(jsonData.toString());
+
+  if (JSON.parse(jsonData.toString()) === undefined)
+    return {
+      notFound: true,
+      redirect: {
+        statusCode: 400,
+        destination: "/no-data",
+      },
+    };
+
+  if (products.length === 0) return { notFound: true };
+
   return {
     props: {
       products,
