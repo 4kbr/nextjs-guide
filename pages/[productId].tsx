@@ -6,10 +6,14 @@ import fs from "fs/promises";
 export default function ProductDetail({ product }: any) {
   console.log({ product });
 
+  if (!product) {
+    return <p>Loading....</p>;
+  }
+
   return (
     <Fragment>
-      <h1>TItle</h1>
-      <h1>DEscription</h1>
+      <h1>{product.title}</h1>
+      <h1>{product.description}</h1>
     </Fragment>
   );
 }
@@ -43,14 +47,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
 
 export const getStaticPaths: GetStaticPaths = async (context) => {
   return {
-    paths: [
-      { params: { productId: "p1" } },
-      { params: { productId: "p2" } },
-      { params: { productId: "p3" } },
-      { params: { productId: "p4" } },
-      { params: { productId: "p5" } },
-      { params: { productId: "p6" } },
-    ],
-    fallback: false,
+    paths: [{ params: { productId: "p1" } }],
+    fallback: true,
   };
 };
